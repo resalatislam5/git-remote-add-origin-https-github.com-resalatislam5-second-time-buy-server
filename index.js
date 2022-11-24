@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
+const jwt = require('jsonwebtoken')
 const app = express()
 const port = process.env.PORT || 5000;
 app.use(cors())
@@ -13,6 +14,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function  run() {
     try{
         const productCollection = client.db('SecondTimeBuy').collection('Products')
+        const usersCollection = client.db('SecondTimeBuy').collection('users')
         //all products
         app.get('/products',async(req,res)=>{
             const query = {};
@@ -43,6 +45,26 @@ async function  run() {
             const query = {'categoryname' : 'Luxury Car'};
             const luxuryCar = await productCollection.find(query).toArray()
             res.send(luxuryCar)
+        })
+        //user
+        app.put('/users',async (req,res)=>{
+            const user = req.body;
+            const email= req.query.email;
+            console.log(user,email)
+            const query = {email : email}
+            const options = { upsert: true };
+            const updateDoc = {
+                $set:{
+                    user
+                }
+            }
+            const result = await usersCollection.updateOne(query, updateDoc, options)
+            const find = await usersCollection.findOne(query);
+            if(find){
+                const token = jwt.sign({email}, process.env.JWT_TOKEN,  { expiresIn: '1d'})
+                result.token = token;
+                res.send(result)
+            }
         })
     }
     finally{
