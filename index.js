@@ -13,22 +13,29 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function  run() {
     try{
         const productCollection = client.db('SecondTimeBuy').collection('Products')
+        //all products
         app.get('/products',async(req,res)=>{
             const query = {};
             const products = await productCollection.find(query).toArray()
             res.send(products)
         })
+        // id load product
         app.get('/products/:id',async(req,res)=>{
             const id = req.params.id;
-            console.log(id)
             const query = {_id : ObjectId(id)};
             const product = await productCollection.findOne(query)
             res.send(product)
         })
+        //electric bikes
         app.get('/electirc-bikes',async(req,res)=>{
             const query = {'categoryname' : 'Electirc Bikes'};
             const electircBike = await productCollection.find(query).toArray()
-            console.log(electircBike)
+            res.send(electircBike)
+        })
+        //microbus
+        app.get('/microbus',async(req,res)=>{
+            const query = {'categoryname' : 'Microbus'};
+            const electircBike = await productCollection.find(query).toArray()
             res.send(electircBike)
         })
     }
