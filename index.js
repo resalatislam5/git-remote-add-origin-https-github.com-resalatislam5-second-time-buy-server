@@ -35,8 +35,14 @@ async function  run() {
         //microbus
         app.get('/microbus',async(req,res)=>{
             const query = {'categoryname' : 'Microbus'};
-            const electircBike = await productCollection.find(query).toArray()
-            res.send(electircBike)
+            const microbus = await productCollection.find(query).toArray()
+            res.send(microbus)
+        })
+        //Luxury Car
+        app.get('/luxury-car',async(req,res)=>{
+            const query = {'categoryname' : 'Luxury Car'};
+            const luxuryCar = await productCollection.find(query).toArray()
+            res.send(luxuryCar)
         })
     }
     finally{
