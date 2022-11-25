@@ -22,6 +22,13 @@ async function  run() {
             const products = await productCollection.find(query).toArray()
             res.send(products)
         })
+        //post products
+        app.post('/products',async(req,res)=>{
+            const product = req.body;
+            console.log(product)
+            const result = await productCollection.insertOne(product)
+            res.send(result)
+        })
         // id load product
         app.get('/products/:id',async(req,res)=>{
             const id = req.params.id;
@@ -71,11 +78,19 @@ async function  run() {
         app.get('/users',async(req,res)=>{
             const email = req.query.email;
             const query = {email : email}
+            const allQuery = {}
             const user = await usersCollection.findOne(query);
             if(user.user.role === 'admin'){
-                const result = await usersCollection.find(query).toArray();
+                const result = await usersCollection.find(allQuery).toArray();
                 res.send(result)
             }
+        })
+        //user delete
+        app.delete('/user/:id',async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id : ObjectId(id)}
+            const result = await usersCollection.deleteOne(query)
+            res.send(result)
         })
         //post booking
         app.post('/booking',async (req,res)=>{
