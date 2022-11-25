@@ -67,6 +67,16 @@ async function  run() {
                 res.send(result)
             }
         })
+        //user collection
+        app.get('/users',async(req,res)=>{
+            const email = req.query.email;
+            const query = {email : email}
+            const user = await usersCollection.findOne(query);
+            if(user.user.role === 'admin'){
+                const result = await usersCollection.find(query).toArray();
+                res.send(result)
+            }
+        })
         //post booking
         app.post('/booking',async (req,res)=>{
             const booking = req.body;
@@ -76,10 +86,13 @@ async function  run() {
         //user booking
         app.get('/booking',async (req,res)=>{
             const email = req.query.email;
-            console.log(email)
             const query = {email : email}
-            const result = await bookingCollection.find(query).toArray()
-            res.send(result)
+            const user = await usersCollection.findOne(query);
+            if(user.user.role){
+                const result = await bookingCollection.find(query).toArray();
+                const role = {role:user.user.role}
+                res.send({result,role})
+            }
         })
     }
     finally{
