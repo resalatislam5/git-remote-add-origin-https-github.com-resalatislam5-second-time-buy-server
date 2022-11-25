@@ -15,6 +15,7 @@ async function  run() {
     try{
         const productCollection = client.db('SecondTimeBuy').collection('Products')
         const usersCollection = client.db('SecondTimeBuy').collection('users')
+        const bookingCollection = client.db('SecondTimeBuy').collection('booking')
         //all products
         app.get('/products',async(req,res)=>{
             const query = {};
@@ -67,8 +68,14 @@ async function  run() {
             }
         })
         app.post('/booking',async (req,res)=>{
-            const user = req.body;
-            const result = await usersCollection.insertOne(user)
+            const booking = req.body;
+            const result = await bookingCollection.insertOne(booking)
+            res.send(result)
+        })
+        app.get('/booking',async (req,res)=>{
+            const email = req.query.email;
+            const query = {email : email}
+            const result = await bookingCollection.findOne(query)
             res.send(result)
         })
     }
