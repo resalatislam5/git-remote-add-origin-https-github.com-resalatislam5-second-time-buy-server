@@ -26,7 +26,6 @@ async function  run() {
         //products report
         app.put('/reportedproduct/:id',async(req,res)=>{
             const id= req.params.id
-            console.log(id)
             const query = {_id : ObjectId(id)}
             const options = { upsert: true };
             const updateDoc = {
@@ -47,12 +46,13 @@ async function  run() {
                 const reportedItems = await productCollection.find(allQuery).toArray()
                 res.send(reportedItems)
             }
-            res.status(401).send({massage: 'unAuthorized access'})
+            else{
+                res.status(401).send({massage: 'unAuthorized access'})
+            }
         })
         //post products
         app.post('/products',async(req,res)=>{
             const product = req.body;
-            console.log(product)
             const result = await productCollection.insertOne(product)
             res.send(result)
         })
@@ -88,8 +88,12 @@ async function  run() {
             const query = {email : email}
             const options = { upsert: true };
            if( Object.keys(user).length === 0 ){
-            console.log('null paini')
-            const result = await usersCollection.updateOne(query, options)
+            const updateDoc = {
+                $set:{
+                    
+                }
+            }
+            const result = await usersCollection.updateOne(query,updateDoc,options)
             const find = await usersCollection.findOne(query);
             if(find){
                 const token = jwt.sign({email}, process.env.JWT_TOKEN,  { expiresIn: '1d'})
@@ -106,7 +110,6 @@ async function  run() {
                 const result = await usersCollection.updateOne(query, updateDoc, options)
                 const find = await usersCollection.findOne(query);
                 if(find){
-                    console.log('user paici')
                     const token = jwt.sign({email}, process.env.JWT_TOKEN,  { expiresIn: '1d'})
                     result.token = token;
                     res.send(result)
@@ -132,6 +135,35 @@ async function  run() {
             const role = {role:user?.user?.role}
             res.send(role)
         })
+        //seller
+        app.get('/sellers',async (req,res)=>{
+            const email = req.query.email;
+            const query = {email : email}
+            const user = await usersCollection.findOne(query);
+            if(user.user.role === 'admin'){
+                const allQuery = {'user.role' : 'seller'}
+                const seller = await usersCollection.find(allQuery).toArray()
+                console.log(seller)
+                res.send(seller)
+            }
+            else{
+                res.status(401).send({massage: 'unAuthorized access'})
+            }
+        })
+        //seller verify
+        app.put('/sellers/:id',async (req,res)=>{
+                const id= req.params.id
+                console.log(id)
+                const query = {_id : ObjectId(id)}
+                const options = { upsert: true };
+                const updateDoc = {
+                    $set:{
+                        'user.verified': true
+                    }
+                }
+                const result = await usersCollection.updateOne(query,updateDoc,options)
+                res.send(result)
+        })
         //user delete
         app.delete('/user/:id',async(req,res)=>{
             const id = req.params.id;
@@ -148,7 +180,6 @@ async function  run() {
         // advertise
         app.put('/advertise/:id',async (req,res)=>{
             const id= req.params.id
-            console.log(id)
             const query = {_id : ObjectId(id)}
             const options = { upsert: true };
             const updateDoc = {
