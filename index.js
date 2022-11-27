@@ -164,6 +164,15 @@ async function  run() {
                 const result = await usersCollection.updateOne(query,updateDoc,options)
                 res.send(result)
         })
+        //seller verify
+        app.get('/sellerVerify',async (req,res)=>{
+            const email = req.query.email;
+            console.log(email)
+            const query = {email : email}
+            const user = await usersCollection.findOne(query);
+            console.log(user)
+            res.send(user)
+        })
         //user delete
         app.delete('/user/:id',async(req,res)=>{
             const id = req.params.id;
