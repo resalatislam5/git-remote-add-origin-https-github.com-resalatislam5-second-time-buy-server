@@ -215,8 +215,11 @@ async function  run() {
             res.send(result)
         })
         // advertise
-        app.get('/advertise',async (req,res)=>{
+        app.get('/advertise',verifyJWT,async (req,res)=>{
             const query = {avt : true}
+            if(email !== decodedEmail){
+                return res.status(403).send({message : 'forbidden access'})
+            }
             const result = await productCollection.find(query).toArray()
             res.send(result)
         })
